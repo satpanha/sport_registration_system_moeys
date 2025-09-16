@@ -6,8 +6,6 @@ import {
   Typography,
   Box,
   Divider,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material';
 
 import {
@@ -20,6 +18,8 @@ import {
   SubmitActions,
 } from '../components/RegisterFormSections';
 
+import Navbar from '../components/Navbar';
+
 import type { FormData } from '../types/FormData';
 import { useI18n } from '../hooks/useI18n';
 import { useForm } from '../hooks/useForm';
@@ -29,7 +29,7 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ type }) => {
-  const { t, lang, setLang } = useI18n();
+  const { t } = useI18n();
   const initialPosition = type === 'player' ? 'player' : '';
 
   const initialFormData: FormData = {
@@ -65,7 +65,9 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
   };
 
   return (
-    <Container maxWidth="md">
+    <>
+      <Navbar />
+      <Container maxWidth="md">
       <Paper
         elevation={6}
         sx={{
@@ -75,7 +77,7 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
           background: 'linear-gradient(145deg, #fafafa, #ffffffff)',
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
           <Typography
             variant="h4"
             component="h1"
@@ -86,17 +88,6 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
           >
             {getTitle()}
           </Typography>
-
-          <ToggleButtonGroup
-            size="small"
-            exclusive
-            value={lang}
-            onChange={(_e, v) => v && setLang(v)}
-            aria-label="language"
-          >
-            <ToggleButton value="en" aria-label="English">EN</ToggleButton>
-            <ToggleButton value="km" aria-label="Khmer">KH</ToggleButton>
-          </ToggleButtonGroup>
         </Box>
 
         <Typography
@@ -137,6 +128,7 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
         </Box>
       </Paper>
     </Container>
+    </>
   );
 };
 
