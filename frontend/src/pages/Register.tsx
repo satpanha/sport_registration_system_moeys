@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Container,
@@ -10,9 +11,6 @@ import {
 } from '@mui/material';
 
 import {
-  validateForm,
-  sportCategories,
-  sportsByCategory,
   ErrorSummary,
   LocationFields,
   SportTypeSelector,
@@ -22,81 +20,48 @@ import {
   SubmitActions,
 } from '../components/RegisterFormSections';
 
-import type { FormData, FormErrors } from '../components/RegisterFormSections';
-import { useI18n } from '../i18n';
+import type { FormData } from '../types/FormData';
+import { useI18n } from '../hooks/useI18n';
+import { useForm } from '../hooks/useForm';
 
-const Register: React.FC = () => {
+interface RegisterProps {
+  type: 'leader' | 'player';
+}
+
+const Register: React.FC<RegisterProps> = ({ type }) => {
   const { t, lang, setLang } = useI18n();
+  const initialPosition = type === 'player' ? 'player' : '';
 
-  const initialCategory = sportCategories[0];
-  const initialSport = sportsByCategory[initialCategory][0];
-
-  const [formData, setFormData] = React.useState<FormData>({
-    province: '',
-    department: '',
-    eventType: '',
-    position: '',
+  const initialFormData: FormData = {
+    province: null,
+    department: null,
+    eventType: null,
+    position: initialPosition,
     firstName: '',
     lastName: '',
     nationalID: '',
     phone: '',
     dob: '',
     photoUpload: null,
-    typeOfSport: initialCategory,
-    selectedSport: initialSport,
-  });
-
-  const [errors, setErrors] = React.useState<FormErrors>({});
-  const [submitting, setSubmitting] = React.useState(false);
-
-  const onFieldChange = (field: keyof FormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error as user edits
-    setErrors((prev: FormErrors) => ({ ...prev, [field]: undefined }));
+    typeOfSport: null,
+    selectedSport: null,
+    category: null, // reserved for future use
   };
 
-  const onReset = () => {
-    setFormData({
-      province: '',
-      department: '',
-      eventType: '',
-      position: '',
-      firstName: '',
-      lastName: '',
-      nationalID: '',
-      phone: '',
-      dob: '',
-      photoUpload: null,
-      typeOfSport: initialCategory,
-      selectedSport: initialSport,
-    });
-    setErrors({});
-  };
+  const {
+    formData,
+    errors,
+    submitting,
+    onFieldChange,
+    onReset,
+    handleSubmit,
+  } = useForm({ initialFormData, registrationType: type });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const nextErrors = validateForm(formData, t);
-    setErrors(nextErrors);
-
-    const hasErrors = Object.values(nextErrors).some(Boolean);
-    if (hasErrors) {
-      // Focus the first error field by id if any
-      const firstErrorKey = Object.keys(nextErrors).find((k) => nextErrors[k as keyof FormErrors]);
-      if (firstErrorKey) {
-        const el = document.querySelector(`[name="${firstErrorKey}"]`) as HTMLElement | null;
-        if (el && typeof el.focus === 'function') el.focus();
-      }
-      return;
+  const getTitle = () => {
+    if (type === 'player') {
+      return t('registration.title.player');
     }
-
-    // Simulate submission
-    setSubmitting(true);
-    setTimeout(() => {
-      console.log('Submitted form data:', formData);
-      setSubmitting(false);
-      alert(t('alerts.submitSuccess', 'Registration submitted successfully!'));
-      onReset();
-    }, 800);
+    return t('registration.title.coachLeader');
   };
 
   return (
@@ -107,7 +72,7 @@ const Register: React.FC = () => {
           p: { xs: 3, sm: 5 },
           borderRadius: 3,
           mt: { xs: 3, sm: 6 },
-          background: 'linear-gradient(145deg, #fafafa, #ffffff)',
+          background: 'linear-gradient(145deg, #fafafa, #ffffffff)',
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -119,7 +84,7 @@ const Register: React.FC = () => {
             fontWeight={800}
             sx={{ mb: 0, letterSpacing: 0.3 }}
           >
-            {t('registration.title', 'Registration Form')}
+            {getTitle()}
           </Typography>
 
           <ToggleButtonGroup
@@ -155,7 +120,12 @@ const Register: React.FC = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          <PersonalInfoFields data={formData} onChange={onFieldChange} errors={errors} />
+          <PersonalInfoFields
+            data={formData}
+            onChange={onFieldChange}
+            errors={errors}
+            registrationType={type}
+          />
 
           <PhotoUpload
             file={formData.photoUpload}

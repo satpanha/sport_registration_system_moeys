@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
+//i18n.tsx
+import React, { createContext, useMemo, useState, useEffect } from 'react';
+// import { useI18n } from '../utils/validation';
 
 export type Lang = 'en' | 'km';
 
@@ -11,15 +13,15 @@ type I18nContextValue = {
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
-export function useI18n() {
-  const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error('useI18n must be used within LanguageProvider');
-  return ctx;
-}
 
 // Helper to resolve deep keys like 'registration.title'
-function get(obj: any, path: string): any {
-  return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+function get(obj: Record<string, unknown>, path: string): unknown {
+  return path.split('.').reduce((acc, part) => {
+    if (acc && typeof acc === 'object' && acc !== null && part in acc) {
+      return (acc as Record<string, unknown>)[part];
+    }
+    return undefined;
+  }, obj as unknown);
 }
 
 // Categories we support for option label translation
@@ -34,7 +36,10 @@ const optionCategories = {
 const translations = {
   en: {
     registration: {
-      title: 'Registration Form',
+      title: {
+        player: 'Player Registration Form',
+        coachLeader: 'Coach/Leader Registration Form',
+      },
       subtitle: 'Please fill in the details below. Fields marked as required must be completed.',
     },
     errorSummary: {
@@ -72,6 +77,10 @@ const translations = {
       intermediate: 'Intermediate',
       advanced: 'Advanced',
       expert: 'Expert',
+      player: 'Player',
+      coach: 'Coach',
+      leader: 'Leader',
+      playerFixed: 'Fixed as Player',
     },
     upload: {
       title: 'Upload Photo (optional)',
@@ -162,7 +171,10 @@ const translations = {
   },
   km: {
     registration: {
-      title: 'បែបបទចុះឈ្មោះ',
+      title: {
+        player: 'ទម្រង់ចុះឈ្មោះអ្នកលេង',
+        coachLeader: 'ទម្រង់ចុះឈ្មោះគ្រូ/មេដឹកនាំ',
+      },
       subtitle: 'សូមបំពេញព័ត៌មានខាងក្រោម។ វាលដែលត្រូវបំពេញត្រូវបំពេញអស់ទាំងអស់។',
     },
     errorSummary: {
@@ -200,6 +212,10 @@ const translations = {
       intermediate: 'កម្រិតមធ្យម',
       advanced: 'កម្រិតខ្ពស់',
       expert: 'អ្នកជំនាញ',
+      player: 'អ្នកលេង',
+      coach: 'គ្រូ',
+      leader: 'មេដឹកនាំ',
+      playerFixed: 'កំណត់ជាអ្នកលេង',
     },
     upload: {
       title: 'អាប់ឡោតរូបថត (ស្រេចចិត្ត)',
@@ -269,7 +285,7 @@ const translations = {
         'Siem Reap': 'សៀមរាប',
         'Preah Sihanouk': 'ព្រះសីហនុ',
         'Stung Treng': 'ស្ទឹងត្រែង',
-        'Svay Rieng': 'ស్వាយរៀង',
+        'Svay Rieng': 'ស្វាយរៀង',
         Takeo: 'តាកែវ',
         'Tbong Khmum': 'ត្បូងឃ្មុំ',
       },
@@ -316,6 +332,8 @@ const translations = {
   },
 } as const;
 
+type TranslationOptions = typeof translations[keyof typeof translations]['options'];
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Lang>(() => {
     if (typeof window !== 'undefined') {
@@ -336,18 +354,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<I18nContextValue>(() => {
     const t = (key: string, fallback?: string) => {
-      const v = get(translations[lang as keyof typeof translations], key);
+      const langTranslations = translations[lang as keyof typeof translations] as Record<string, unknown>;
+      const v = get(langTranslations, key);
       if (typeof v === 'string') return v;
       return fallback ?? key;
     };
 
     const optLabel = (category: keyof typeof optionCategories, value: string) => {
       if (lang === 'km') {
-        const translated = (translations.km.options as any)[category]?.[value];
+        const kmOptions = translations.km.options as TranslationOptions;
+        const categoryOptions = kmOptions[category] as Record<string, string> | undefined;
+        const translated = categoryOptions?.[value];
         if (translated) return translated;
       }
       // English or fallback to original value
-      const enTranslated = (translations.en.options as any)[category]?.[value];
+      const enOptions = translations.en.options as TranslationOptions;
+      const categoryOptions = enOptions[category] as Record<string, string> | undefined;
+      const enTranslated = categoryOptions?.[value];
       return enTranslated || value;
     };
 
@@ -356,3 +379,5 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
+
+export { I18nContext };

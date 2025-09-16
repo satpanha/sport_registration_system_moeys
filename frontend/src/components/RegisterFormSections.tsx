@@ -1,152 +1,17 @@
+//registerFormSections.tsx
 import React from 'react';
 import {
   Box,
   Typography,
-  TextField,
-  MenuItem,
-  FormControl,
-  FormLabel,
-  RadioGroup,
   FormControlLabel,
-  Radio,
+  Checkbox,
   Button,
   Alert,
 } from '@mui/material';
-import { useI18n } from '../i18n';
-
-// Types
-export interface FormData {
-  province: string;
-  department: string;
-  eventType: string;
-  typeOfSport: string;
-  selectedSport: string;
-  position: string;
-  firstName: string;
-  lastName: string;
-  nationalID: string;
-  phone: string;
-  dob: string;
-  photoUpload: File | null;
-}
-
-export type FormErrors = Partial<Record<keyof FormData, string>> & {
-  photoUpload?: string;
-};
-
-export type OnFieldChange = (field: keyof FormData, value: any) => void;
-
-// Options/Constants
-export const provinces = [
-  'Phnom Penh', 'Banteay Meanchey', 'Battambang', 'Kampong Cham', 'Kampong Chhnang',
-  'Kampong Speu', 'Kampong Thom', 'Kampot', 'Kandal', 'Kep', 'Koh Kong', 'Kratie',
-  'Mondulkiri', 'Oddar Meanchey', 'Pailin', 'Preah Vihear', 'Prey Veng', 'Pursat',
-  'Ratanakiri', 'Siem Reap', 'Preah Sihanouk', 'Stung Treng', 'Svay Rieng', 'Takeo',
-  'Tbong Khmum'
-];
-
-export const departments = ['Department 1', 'Department 2', 'Department 3'];
-export const eventTypes = ['Event Type 1', 'Event Type 2', 'Event Type 3'];
-
-export const sportCategories = [
-  'Traditional Cambodian Sports & Games',
-  'Ball Games',
-  'Martial Arts & Combat Sports',
-  'Athletics & Outdoor Sports',
-  'Indoor & Recreational Sports',
-] as const;
-
-export const sportsByCategory: Record<string, string[]> = {
-  'Traditional Cambodian Sports & Games': ['Bokator', 'Pradal Serey', 'Chol Chhoung', 'Teanh Prot'],
-  'Ball Games': ['Football', 'Volleyball', 'Basketball', 'Sepak Takraw'],
-  'Martial Arts & Combat Sports': ['Karate', 'Taekwondo', 'Boxing', 'Judo'],
-  'Athletics & Outdoor Sports': ['Running', 'Cycling', 'Swimming', 'Archery'],
-  'Indoor & Recreational Sports': ['Table Tennis', 'Badminton', 'Chess', 'E-sports'],
-};
-
-// Validation helpers Regex patterns
-const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
-const numericRegex = /^[0-9]+$/;
-
-export function validateForm(
-  data: FormData,
-  t: (key: string, fallback?: string) => string,
-): FormErrors {
-  const errors: FormErrors = {};
-
-  // Required text fields
-  if (!data.province) errors.province = t('errors.province.required', 'Please select your province.');
-  if (!data.department) errors.department = t('errors.department.required', 'Please select your department.');
-  if (!data.eventType) errors.eventType = t('errors.eventType.required', 'Please select the event type.');
-  if (!data.firstName.trim()) errors.firstName = t('errors.firstName.required', 'First name is required.');
-  if (!data.lastName.trim()) errors.lastName = t('errors.lastName.required', 'Last name is required.');
-  if (!data.position) errors.position = t('errors.position.required', 'Please choose your position level.');
-
-  // National ID: numeric, reasonable length
-  if (!data.nationalID.trim()) {
-    errors.nationalID = t('errors.nationalID.required', 'National ID is required.');
-  } else if (!numericRegex.test(data.nationalID)) {
-    errors.nationalID = t('errors.nationalID.digits', 'National ID should contain digits only.');
-  } else if (data.nationalID.length < 6 || data.nationalID.length > 20) {
-    errors.nationalID = t('errors.nationalID.length', 'National ID must be between 6 and 20 digits.');
-  }
-
-  // Phone
-  if (!data.phone.trim()) {
-    errors.phone = t('errors.phone.required', 'Phone number is required.');
-  } else if (!phoneRegex.test(data.phone)) {
-    errors.phone = t('errors.phone.invalid', 'Enter a valid phone number (7–15 digits).');
-  }
-
-  // DOB not empty and not in the future
-  if (!data.dob) {
-    errors.dob = t('errors.dob.required', 'Date of birth is required.');
-  } else {
-    const today = new Date();
-    const dobDate = new Date(data.dob);
-    if (isNaN(dobDate.getTime())) {
-      errors.dob = t('errors.dob.invalid', 'Enter a valid date.');
-    } else if (dobDate > today) {
-      errors.dob = t('errors.dob.future', 'Date of birth cannot be in the future.');
-    }
-  }
-
-  // Sports selection
-  if (!data.typeOfSport) errors.typeOfSport = t('errors.typeOfSport.required', 'Please select a sport category.');
-  if (!data.selectedSport) {
-    errors.selectedSport = t('errors.selectedSport.required', 'Please select a sport.');
-  } else if (
-    data.typeOfSport &&
-    !sportsByCategory[data.typeOfSport]?.includes(data.selectedSport)
-  ) {
-    errors.selectedSport = t('errors.selectedSport.mismatch', 'Selected sport does not match the chosen category.');
-  }
-
-  // Photo upload: optional, but if present must be an image and <= 2MB
-  if (data.photoUpload) {
-    const file = data.photoUpload;
-    const isImage = file.type.startsWith('image/');
-    const maxSize = 2 * 1024 * 1024; // 2MB
-    if (!isImage) {
-      errors.photoUpload = t('upload.errors.type', 'Only image files are allowed (JPG, PNG, etc.).');
-    } else if (file.size > maxSize) {
-      errors.photoUpload = t('upload.errors.size', 'Image must be 2MB or smaller.');
-    }
-  }
-
-  return errors;
-}
-
-// Shared styles tuned for readability and accessibility
-const fieldSx = {
-  '& .MuiInputBase-root': {
-    fontSize: '1.1rem',
-    minHeight: 56,
-  },
-  '& .MuiInputLabel-root': {
-    fontSize: '1.05rem',
-  },
-};
+import { useI18n } from '../hooks/useI18n';
+import { provinces, departments, eventTypes, sportCategories, sportsByCategory} from '../constants/formData';
+import FormField from './FormField';
+import type { FormData, FormErrors, OnFieldChange } from '../types/FormData';
 
 // Components
 export function ErrorSummary({ errors }: { errors: FormErrors }) {
@@ -169,9 +34,25 @@ export function LocationFields({
 }: {
   data: FormData;
   onChange: OnFieldChange;
-  errors: FormErrors;x
+  errors: FormErrors;
 }) {
   const { t, optLabel } = useI18n();
+
+  const provinceOptions = [
+    { value: '', label: t('location.province.none', 'None') },
+    ...provinces.map((prov) => ({ value: prov, label: optLabel('provinces', prov) })),
+  ];
+
+  const departmentOptions = [
+    { value: '', label: t('location.department.none', 'None') },
+    ...departments.map((dept) => ({ value: dept, label: optLabel('departments', dept) })),
+  ];
+
+  const eventTypeOptions = eventTypes.map((evt) => ({
+    value: evt,
+    label: optLabel('eventTypes', evt),
+  }));
+
   return (
     <Box>
       <Typography variant="h6" fontWeight={700} mb={1}>
@@ -192,66 +73,44 @@ export function LocationFields({
           },
         }}
       >
-        <Box>
-          <TextField
-            select
-            label={t('location.province.label', 'Province')}
-            name="province"
-            value={data.province}
-            onChange={(e) => onChange('province', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.province}
-            helperText={errors.province}
-            sx={fieldSx}
-          >
-            {provinces.map((prov) => (
-              <MenuItem key={prov} value={prov}>
-                {optLabel('provinces', prov)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box>
-          <TextField
-            select
-            label={t('location.department.label', 'Department')}
-            name="department"
-            value={data.department}
-            onChange={(e) => onChange('department', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.department}
-            helperText={errors.department}
-            sx={fieldSx}
-          >
-            {departments.map((dept) => (
-              <MenuItem key={dept} value={dept}>
-                {optLabel('departments', dept)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box>
-          <TextField
-            select
-            label={t('location.eventType.label', 'Type of Event')}
-            name="eventType"
-            value={data.eventType}
-            onChange={(e) => onChange('eventType', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.eventType}
-            helperText={errors.eventType}
-            sx={fieldSx}
-          >
-            {eventTypes.map((evt) => (
-              <MenuItem key={evt} value={evt}>
-                {optLabel('eventTypes', evt)}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
+        <FormField
+          select
+          label={t('location.province.label', 'Province')}
+          name="province"
+          value={data.province}
+          disabled={!!data.department}
+          onChange={(e) => {
+            onChange('province', e.target.value);
+            if (e.target.value) onChange('department', null);
+          }}
+          error={errors.province}
+          options={provinceOptions}
+          required
+        />
+        <FormField
+          select
+          label={t('location.department.label', 'Department')}
+          name="department"
+          value={data.department}
+          disabled={!!data.province}
+          onChange={(e) => {
+            onChange('department', e.target.value);
+            if (e.target.value) onChange('province', null);
+          }}
+          error={errors.department}
+          options={departmentOptions}
+          required
+        />
+        <FormField
+          select
+          label={t('location.eventType.label', 'Type of Event')}
+          name="eventType"
+          value={data.eventType}
+          onChange={(e) => onChange('eventType', e.target.value)}
+          error={errors.eventType}
+          options={eventTypeOptions}
+          required
+        />
       </Box>
     </Box>
   );
@@ -267,10 +126,17 @@ export function SportTypeSelector({
   errors: FormErrors;
 }) {
   const { t, optLabel } = useI18n();
-  const handleCategoryChange = (value: string) => {
-    const firstSport = sportsByCategory[value]?.[0] || '';
-    onChange('typeOfSport', value);
+
+  // handle selecting a category
+  const handleCategoryChange = (category: string | null) => {
+    onChange('typeOfSport', category);
+    const firstSport = category && sportsByCategory[category] && sportsByCategory[category].length > 0
+      ? sportsByCategory[category][0]
+      : null;
     onChange('selectedSport', firstSport);
+    if (firstSport === null ) {
+      onChange('selectedSport', null);
+    }
   };
 
   return (
@@ -278,31 +144,36 @@ export function SportTypeSelector({
       <Typography variant="h6" fontWeight={700} mb={1}>
         {t('sport.selector.title', 'Sport Category')}
       </Typography>
-      <Typography variant="body1" color="text.secondary" mb={2}>
-        {t('sport.selector.subtitle', 'Choose a category, then pick a specific sport.')}
+
+      {/* Category Selection */}
+      <Typography variant="body1" color="text.secondary" mb={1}>
+        {t('sport.selector.subtitle', 'Select a sport category')}
       </Typography>
-      <FormControl component="fieldset">
-        <FormLabel component="legend" sx={{ mb: 1 }}>
-          {t('sport.selector.legend', 'Type of Sport')}
-        </FormLabel>
-        <RadioGroup
-          name="typeOfSport"
-          value={data.typeOfSport}
-          onChange={(e) => handleCategoryChange(e.target.value)}
-        >
-          {sportCategories.map((sport) => (
-            <FormControlLabel
-              key={sport}
-              value={sport}
-              control={<Radio />}
-              label={<Typography sx={{ fontSize: '1.05rem' }}>{optLabel('sportCategories', sport)}</Typography>}
-            />)
-          )}
-        </RadioGroup>
-        {errors.typeOfSport && (
-          <Typography mt={0.5} color="error">{errors.typeOfSport}</Typography>
-        )}
-      </FormControl>
+      <Box
+        display="grid"
+        gap={2}
+        sx={{ gridTemplateColumns: { xs: '1fr', sm: 'repeat(5, 1fr)' } }} // 5 columns
+      >
+        {sportCategories.map((cat) => (
+          <FormControlLabel
+            key={cat}
+            control={
+              <Checkbox
+                checked={data.typeOfSport === cat}
+                onChange={() =>
+                  handleCategoryChange(data.typeOfSport === cat ? null : cat)
+                }
+              />
+            }
+            label={optLabel('sportCategories', cat)}
+          />
+        ))}
+      </Box>
+      {errors.typeOfSport && (
+        <Typography mt={0.5} color="error">
+          {errors.typeOfSport}
+        </Typography>
+      )}
     </Box>
   );
 }
@@ -317,27 +188,25 @@ export function SportSelect({
   errors: FormErrors;
 }) {
   const { t, optLabel } = useI18n();
-  const options = sportsByCategory[data.typeOfSport] || [];
+  const sportOptions = (data.typeOfSport ? sportsByCategory[data.typeOfSport] ?? [] : []).map(
+    (sport) => ({ value: sport, label: optLabel('sports', sport) })
+  );
+
   return (
     <Box mt={2}>
-      <TextField
+      <FormField
         select
         label={t('sport.select.label', 'Select Sport')}
         name="selectedSport"
-        value={data.selectedSport || ''}
+        value={data.selectedSport ?? ''}
         onChange={(e) => onChange('selectedSport', e.target.value)}
-        fullWidth
+        error={errors.selectedSport}
+        options={[
+          { value: '', label: t('sport.select.placeholder', 'Select a sport') },
+          ...sportOptions,
+        ]}
         required
-        error={!!errors.selectedSport}
-        helperText={errors.selectedSport}
-        sx={fieldSx}
-      >
-        {options.map((sport) => (
-          <MenuItem key={sport} value={sport}>
-            {optLabel('sports', sport)}
-          </MenuItem>
-        ))}
-      </TextField>
+      />
     </Box>
   );
 }
@@ -346,12 +215,28 @@ export function PersonalInfoFields({
   data,
   onChange,
   errors,
+  registrationType,
 }: {
   data: FormData;
   onChange: OnFieldChange;
   errors: FormErrors;
+  registrationType?: 'leader' | 'player';
 }) {
   const { t } = useI18n();
+  
+  const isPlayerRegistration = registrationType === 'player';
+  
+  const positionOptions = isPlayerRegistration
+    ? [{ value: 'player', label: t('positions.player', 'Player') }]
+    : [
+        { value: 'beginner', label: t('positions.beginner', 'Beginner') },
+        { value: 'intermediate', label: t('positions.intermediate', 'Intermediate') },
+        { value: 'advanced', label: t('positions.advanced', 'Advanced') },
+        { value: 'expert', label: t('positions.expert', 'Expert') },
+        { value: 'coach', label: t('positions.coach', 'Coach') },
+        { value: 'leader', label: t('positions.leader', 'Leader') },
+      ];
+
   return (
     <Box mt={3}>
       <Typography variant="h6" fontWeight={700} mb={1}>
@@ -372,92 +257,63 @@ export function PersonalInfoFields({
           },
         }}
       >
-        <Box>
-          <TextField
-            label={t('fields.firstName', 'First Name')}
-            name="firstName"
-            value={data.firstName}
-            onChange={(e) => onChange('firstName', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.firstName}
-            helperText={errors.firstName}
-            sx={fieldSx}
-          />
-        </Box>
-        <Box>
-          <TextField
-            label={t('fields.lastName', 'Last Name')}
-            name="lastName"
-            value={data.lastName}
-            onChange={(e) => onChange('lastName', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.lastName}
-            helperText={errors.lastName}
-            sx={fieldSx}
-          />
-        </Box>
-        <Box>
-          <TextField
-            select
-            label={t('fields.position', 'Position')}
-            name="position"
-            value={data.position}
-            onChange={(e) => onChange('position', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.position}
-            helperText={errors.position}
-            sx={fieldSx}
-          >
-            <MenuItem value="beginner">{t('positions.beginner', 'Beginner')}</MenuItem>
-            <MenuItem value="intermediate">{t('positions.intermediate', 'Intermediate')}</MenuItem>
-            <MenuItem value="advanced">{t('positions.advanced', 'Advanced')}</MenuItem>
-            <MenuItem value="expert">{t('positions.expert', 'Expert')}</MenuItem>
-          </TextField>
-        </Box>
-        <Box>
-          <TextField
-            label={t('fields.nationalID', 'National ID')}
-            name="nationalID"
-            value={data.nationalID}
-            onChange={(e) => onChange('nationalID', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.nationalID}
-            helperText={errors.nationalID}
-            sx={fieldSx}
-          />
-        </Box>
-        <Box>
-          <TextField
-            label={t('fields.dob', 'Date of Birth')}
-            type="date"
-            name="dob"
-            value={data.dob}
-            onChange={(e) => onChange('dob', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.dob}
-            helperText={errors.dob}
-            InputLabelProps={{ shrink: true }}
-            sx={fieldSx}
-          />
-        </Box>
-        <Box>
-          <TextField
-            label={t('fields.phone', 'Phone Number')}
-            name="phone"
-            value={data.phone}
-            onChange={(e) => onChange('phone', e.target.value)}
-            fullWidth
-            required
-            error={!!errors.phone}
-            helperText={errors.phone}
-            sx={fieldSx}
-          />
-        </Box>
+        <FormField
+          name="firstName"
+          label={t('fields.firstName', 'First Name')}
+          value={data.firstName}
+          onChange={(e) => onChange('firstName', e.target.value)}
+          error={errors.firstName}
+          required
+        />
+        <FormField
+          name="lastName"
+          label={t('fields.lastName', 'Last Name')}
+          value={data.lastName}
+          onChange={(e) => onChange('lastName', e.target.value)}
+          error={errors.lastName}
+          required
+        />
+        <FormField
+          name="position"
+          label={t('fields.position', 'Position')}
+          value={data.position}
+          onChange={(e) => onChange('position', e.target.value)}
+          error={errors.position}
+          helperText={
+            isPlayerRegistration
+              ? t('positions.playerFixed', 'Fixed as Player')
+              : errors.position
+          }
+          select
+          options={positionOptions}
+          disabled={isPlayerRegistration}
+          required
+        />
+        <FormField
+          name="nationalID"
+          label={t('fields.nationalID', 'National ID')}
+          value={data.nationalID}
+          onChange={(e) => onChange('nationalID', e.target.value)}
+          error={errors.nationalID}
+          required
+        />
+        <FormField
+          name="dob"
+          label={t('fields.dob', 'Date of Birth')}
+          value={data.dob}
+          onChange={(e) => onChange('dob', e.target.value)}
+          error={errors.dob}
+          type="date"
+          required
+        />
+        <FormField
+          name="phone"
+          label={t('fields.phone', 'Phone Number')}
+          value={data.phone}
+          onChange={(e) => onChange('phone', e.target.value)}
+          error={errors.phone}
+          required
+        />
       </Box>
     </Box>
   );
