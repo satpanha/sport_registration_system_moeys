@@ -168,6 +168,15 @@ const translations = {
         'E-sports': 'E-sports',
       },
     },
+    navbar: {
+      buttons: {
+        leader: 'Register as Leader',
+        player: 'Register as Player'
+      },
+      ministry: {
+        name: 'Ministry of Education, Youth and Sport of Cambodia'
+      }
+    }
   },
   km: {
     registration: {
@@ -329,6 +338,15 @@ const translations = {
         'E-sports': 'អ៊ី-ស្ពត',
       },
     },
+    navbar: {
+      buttons: {
+        leader: 'ចុះឈ្មោះជាមេដឹកនាំ',
+        player: 'ចុះឈ្មោះជាអ្នកលេង'
+      },
+      ministry: {
+        name: 'ក្រសួងអប់រំ យុវជន និងកីឡា'
+      }
+    }
   },
 } as const;
 
