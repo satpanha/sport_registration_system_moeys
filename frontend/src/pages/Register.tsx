@@ -1,3 +1,4 @@
+//register.tsx
 import React from 'react';
 import {
   Container,
@@ -15,7 +16,7 @@ import {
   PersonalInfoFields,
   PhotoUpload,
   SubmitActions,
-} from '../components/RegisterFormSections';
+} from '../components/sections/RegisterFormSections';
 
 import type { FormData } from '../types/FormData';
 import { useI18n } from '../hooks/useI18n';

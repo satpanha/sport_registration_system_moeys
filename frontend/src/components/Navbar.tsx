@@ -1,3 +1,4 @@
+//navbar.tsx
 import React from "react";
 import { useI18n } from "../hooks/useI18n";
 import {
