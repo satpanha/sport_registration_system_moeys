@@ -1,15 +1,15 @@
-import React,{ useState} from "react";
+import React from "react";
 import { useI18n } from "../hooks/useI18n";
 import {
   ToggleButton,
   ToggleButtonGroup,
-  IconButton,
-  Drawer,
+  // IconButton,
+  // Drawer,
 } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import menuIcon from "@mui/icons-material/Menu";
+// import menuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +18,7 @@ import logoImage from "../assets/image.png";
 const Navbar: React.FC = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
-  const [mobile, setMobile]
+  // const [mobile, setMobile] = 
   return (
     <AppBar position="static" sx={{ backgroundColor: "#778acfff", borderRadius: 0}}>
       <Toolbar sx={{ 
@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
               px: { xs: 1, sm: 2 }
 
             }}
-            onClick={ () => navigate('/register-leader')}
+            onClick={ () => navigate('/register/leader')}
           >
             {t('navbar.buttons.leader')}
           </Button>
@@ -92,7 +92,7 @@ const Navbar: React.FC = () => {
               fontSize: { xs: "0.75rem", sm: "0.875rem" },
               px: { xs: 1, sm: 2 }
             }}
-            onClick={ () => navigate('/register-player')}
+            onClick={ () => navigate('/register/player')}
           >
             {t('navbar.buttons.player')}
           </Button>

@@ -9,9 +9,9 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="*" element={<RegisterForm type="player" />} />
-        <Route path="/register-leader" element={<RegisterForm type="leader" />} />
-        <Route path="/register-player" element={<RegisterForm type="player" />} />
+        {/* <Route path="*" element={<RegisterForm type="player" />} /> */}
+        <Route path="register/leader" element={<RegisterForm type="leader" />} />
+        <Route path="register/player" element={<RegisterForm type="player" />} />
       </Routes>
     </Router>
   );
