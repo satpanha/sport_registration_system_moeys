@@ -18,7 +18,7 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: 'Siemreap, sans-serif',
-    fontSize: 16, // base px (MUI defaults to 14)
+    fontSize: 14, 
     h4: {
       fontSize: '2rem',
       '@media (min-width:600px)': {
@@ -26,7 +26,7 @@ const theme = createTheme({
       },
     },
     body1: {
-      fontSize: '1.1rem',
+      fontSize: '0.8rem',
     },
     button: {
       textTransform: 'none',

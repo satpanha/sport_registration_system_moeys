@@ -1,7 +1,7 @@
+//formfield component 
 import React from 'react';
 import { TextField, MenuItem } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
-
 
 interface FormFieldProps extends Omit<TextFieldProps, 'name' | 'label' | 'value' | 'onChange' | 'error' | 'helperText' | 'select' | 'options' | 'disabled' | 'required' | 'type'> {
   name: string;
@@ -55,7 +55,7 @@ const FormField: React.FC<FormFieldProps> = ({
       helperText={error || helperText}
       select={select}
       type={type}
-      sx={fieldSx}
+      sx={{ ...fieldSx, color: 'rgb(19, 32, 80)' }}
       InputLabelProps={type === 'date' ? { shrink: true } : undefined}
       {...rest}
     >

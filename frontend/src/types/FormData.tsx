@@ -1,4 +1,3 @@
-
 export interface FormData {
   province: string | null;
   department: string | null;

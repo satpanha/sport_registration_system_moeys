@@ -152,7 +152,7 @@ export function SportTypeSelector({
       <Box
         display="grid"
         gap={2}
-        sx={{ gridTemplateColumns: { xs: '1fr', sm: 'repeat(5, 1fr)' } }} // 5 columns
+        sx={{ gridTemplateColumns: { xs: '1fr', sm: 'repeat(5, 1fr)' }}} // 5 columns
       >
         {sportCategories.map((cat) => (
           <FormControlLabel
@@ -301,7 +301,7 @@ export function PersonalInfoFields({
           name="dob"
           label={t('fields.dob', 'Date of Birth')}
           value={data.dob}
-          onChange={(e) => onChange('dob', e.target.value)}
+          onChange={(e) => onChange('dob', e.target.value)} 
           error={errors.dob}
           type="date"
           required

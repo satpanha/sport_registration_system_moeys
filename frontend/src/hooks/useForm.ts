@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useI18n } from './useI18n';
 import type { FormData, FormErrors } from '../types/FormData';

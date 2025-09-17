@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Container,
@@ -17,8 +16,6 @@ import {
   PhotoUpload,
   SubmitActions,
 } from '../components/RegisterFormSections';
-
-import Navbar from '../components/Navbar';
 
 import type { FormData } from '../types/FormData';
 import { useI18n } from '../hooks/useI18n';
@@ -65,9 +62,7 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
   };
 
   return (
-    <>
-      <Navbar />
-      <Container maxWidth="md">
+    <Container maxWidth="md">
       <Paper
         elevation={6}
         sx={{
@@ -128,8 +123,7 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
         </Box>
       </Paper>
     </Container>
-    </>
-  );
+);
 };
 
 export default Register;

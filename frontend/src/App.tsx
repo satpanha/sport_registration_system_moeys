@@ -1,40 +1,15 @@
 //app.tsx
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { Button, Box, Typography } from '@mui/material';
-import RegisterForm from './pages/Register';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-function Home() {
-  const navigate = useNavigate();
-  return (
-    <Box sx={{ textAlign: 'center', mt: 8 }}>
-      <Typography variant="h4" gutterBottom>
-        Register As
-      </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ m: 2 }}
-        onClick={() => navigate('/register-leader')}
-      >
-        Coach / Leader
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        sx={{ m: 2 }}
-        onClick={() => navigate('/register-player')}
-      >
-        Player
-      </Button>
-    </Box>
-  );
-}
+import RegisterForm from './pages/Register';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <Router>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="*" element={<RegisterForm type="player" />} />
         <Route path="/register-leader" element={<RegisterForm type="leader" />} />
         <Route path="/register-player" element={<RegisterForm type="player" />} />
       </Routes>
@@ -43,3 +18,4 @@ function App() {
 }
 
 export default App;
+

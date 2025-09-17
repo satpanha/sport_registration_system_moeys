@@ -35,6 +35,11 @@ const optionCategories = {
 
 const translations = {
   en: {
+    home: {
+      title: 'Register As',
+      leader: 'Coach / Leader',
+      player: 'Player'
+    },
     registration: {
       title: {
         player: 'Player Registration Form',
@@ -179,6 +184,11 @@ const translations = {
     }
   },
   km: {
+    home: {
+      title: 'ចុះឈ្មោះជា',
+      leader: 'គ្រូ / មេដឹកនាំ',
+      player: 'អ្នកលេង'
+    },
     registration: {
       title: {
         player: 'ទម្រង់ចុះឈ្មោះអ្នកលេង',
