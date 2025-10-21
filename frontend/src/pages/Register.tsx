@@ -1,3 +1,65 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// // import React from 'react';
+// import {
+//   Container,
+//   Paper,
+//   Typography,
+//   Box,
+//   Divider,
+//   Stepper,
+//   Step,
+//   StepLabel,
+// } from '../components/section/section';
+
+// import { ErrorSummary, LocationFields, PersonalInfoFields, PhotoUpload, SportCategory } from '../components/RegisterFormSections';
+
+// // ... (imports)
+
+// // ... (component definition)
+
+//         <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+//           <ErrorSummary errors={Error} />
+
+//           <LocationFields data={FormData} onChange={onFieldChange} errors={Error} />
+
+//           <Divider sx={{ my: 4 }} />
+
+//           <SportCategory data={FormData} onChange={onFieldChange} errors={Error} />
+
+//           <Divider sx={{ my: 4 }} />
+
+//           <PersonalInfoFields
+//             data={FormData}
+//             onChange={onFieldChange}
+//             errors={Error}
+//             registrationType={type}
+//           />
+
+//           <Divider sx={{ my: 4 }} />
+
+//           <PhotoUpload
+//             file={formData.photoUpload}
+//             onFileChange={(file) => onFieldChange('photoUpload', file)}
+//             error={errors.photoUpload}
+//           />
+
+//           <SubmitActions submitting={submitting} onReset={onReset} />
+//         </Box>
+
+// // ... (rest of the component)      </Paper>
+//     // </Container>
+//   );
+// };
+
+// export default Register;
+// function handleSubmit(event: FormEvent<HTMLDivElement>): void {
+//   throw new Error('Function not implemented.');
+// }
+
+// function onFieldChange<K extends keyof FormData>(field: K, value: FormData[K]): void {
+//   throw new Error('Function not implemented.');
+// }
+
 import React from 'react';
 import {
   Container,
@@ -5,46 +67,44 @@ import {
   Typography,
   Box,
   Divider,
-} from '@mui/material';
+} from '../components/section/section';
 
-import {
-  ErrorSummary,
-  LocationFields,
-  SportTypeSelector,
-  SportSelect,
-  PersonalInfoFields,
-  PhotoUpload,
-  SubmitActions,
+import { 
+  ErrorSummary, 
+  LocationFields, 
+  PersonalInfoFields, 
+  PhotoUpload, 
+  SportCategory,
+  SubmitActions 
 } from '../components/RegisterFormSections';
 
-import type { FormData } from '../types/FormData';
-import { useI18n } from '../hooks/useI18n';
 import { useForm } from '../hooks/useForm';
+import { useI18n } from '../hooks/useI18n';
+import type { FormData } from '../types/FormData';
 
-interface RegisterProps {
+interface RegisterFormProps {
   type: 'leader' | 'player';
 }
 
-const Register: React.FC<RegisterProps> = ({ type }) => {
+const initialFormData: FormData = {
+  province: null,
+  department: null,
+  eventType: null,
+  typeOfSport: null,
+  selectedSport: null,
+  position: 'player', // Default for player registration
+  firstName: '',
+  lastName: '',
+  nationalID: '',
+  phone: '',
+  dob: '',
+  photoUpload: null,
+  category: null,
+};
+
+const RegisterForm: React.FC<RegisterFormProps> = ({ type }) => {
   const { t } = useI18n();
-  const initialPosition = type === 'player' ? 'player' : '';
-
-  const initialFormData: FormData = {
-    province: null,
-    department: null,
-    eventType: null,
-    position: initialPosition,
-    firstName: '',
-    lastName: '',
-    nationalID: '',
-    phone: '',
-    dob: '',
-    photoUpload: null,
-    typeOfSport: null,
-    selectedSport: null,
-    category: null, // reserved for future use
-  };
-
+  
   const {
     formData,
     errors,
@@ -52,59 +112,41 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
     onFieldChange,
     onReset,
     handleSubmit,
-  } = useForm({ initialFormData, registrationType: type });
-
-  const getTitle = () => {
-    if (type === 'player') {
-      return t('registration.title.player');
-    }
-    return t('registration.title.coachLeader');
-  };
+  } = useForm({
+    initialFormData,
+    registrationType: type,
+  });
 
   return (
-    <Container maxWidth="md">
-      <Paper
-        elevation={6}
-        sx={{
-          p: { xs: 3, sm: 5 },
-          borderRadius: 3,
-          mt: { xs: 3, sm: 6 },
-          background: 'linear-gradient(145deg, #fafafa, #ffffffff)',
-        }}
-      >
-        <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
-          <Typography
-            variant="h4"
-            component="h1"
-            gutterBottom
-            textAlign="center"
-            fontWeight={800}
-            sx={{ mb: 0, letterSpacing: 0.3 }}
-          >
-            {getTitle()}
-          </Typography>
-        </Box>
-
-        <Typography
-          variant="body1"
-          textAlign="center"
-          color="text.secondary"
-          sx={{ mb: 3, fontSize: '1.1rem' }}
-        >
-          {t('registration.subtitle', 'Please fill in the details below. Fields marked as required must be completed.')}
+    <Container maxWidth="lg" sx={{ mt: 10, mb: 4 }}>
+      <Paper sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+        <Typography variant="h4" component="h1" mb={3}>
+          {t(type === 'player' ? 'registration.title.player' : 'registration.title.coachLeader')}
+        </Typography>
+        
+        <Typography variant="body1" color="text.secondary" mb={4}>
+          {t('registration.subtitle')}
         </Typography>
 
-        <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        <Box component="form" {...({ noValidate: true } as any)} autoComplete="off" onSubmit={handleSubmit}>
           <ErrorSummary errors={errors} />
 
-          <LocationFields data={formData} onChange={onFieldChange} errors={errors} />
+          <LocationFields 
+            data={formData} 
+            onChange={onFieldChange} 
+            errors={errors} 
+          />
 
-          <Divider sx={{ my: 3 }} />
+          <Divider sx={{ my: 4 }} />
 
-          <SportTypeSelector data={formData} onChange={onFieldChange} errors={errors} />
-          <SportSelect data={formData} onChange={onFieldChange} errors={errors} />
+          <SportCategory 
+            data={formData} 
+            onChange={onFieldChange} 
+            errors={errors} 
+          />
 
-          <Divider sx={{ my: 3 }} />
+          <Divider sx={{ my: 4 }} />
 
           <PersonalInfoFields
             data={formData}
@@ -113,17 +155,22 @@ const Register: React.FC<RegisterProps> = ({ type }) => {
             registrationType={type}
           />
 
+          <Divider sx={{ my: 4 }} />
+
           <PhotoUpload
             file={formData.photoUpload}
             onFileChange={(file) => onFieldChange('photoUpload', file)}
             error={errors.photoUpload}
           />
 
-          <SubmitActions submitting={submitting} onReset={onReset} />
+          <SubmitActions 
+            submitting={submitting} 
+            onReset={onReset} 
+          />
         </Box>
       </Paper>
     </Container>
-);
+  );
 };
 
-export default Register;
+export default RegisterForm;

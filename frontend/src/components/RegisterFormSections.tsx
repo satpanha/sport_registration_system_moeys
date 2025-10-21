@@ -1,13 +1,16 @@
 //registerFormSections.tsx
 import React from 'react';
+// import {
+//   FormControlLabel,
+//   Checkbox,
+// } from '@mui/material';
 import {
   Box,
   Typography,
-  FormControlLabel,
-  Checkbox,
   Button,
   Alert,
-} from '@mui/material';
+  Paper,
+} from './section/section';
 import { useI18n } from '../hooks/useI18n';
 import { provinces, departments, eventTypes, sportCategories, sportsByCategory} from '../constants/formData';
 import FormField from './FormField';
@@ -66,11 +69,7 @@ export function LocationFields({
         display="grid"
         gap={2}
         sx={{
-          gridTemplateColumns: {
-            xs: '1fr',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(3, 1fr)',
-          },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
         }}
       >
         <FormField
@@ -78,11 +77,7 @@ export function LocationFields({
           label={t('location.province.label', 'Province')}
           name="province"
           value={data.province}
-          disabled={!!data.department}
-          onChange={(e) => {
-            onChange('province', e.target.value);
-            if (e.target.value) onChange('department', null);
-          }}
+          onChange={(e) => onChange('province', e.target.value)}
           error={errors.province}
           options={provinceOptions}
           required
@@ -92,11 +87,7 @@ export function LocationFields({
           label={t('location.department.label', 'Department')}
           name="department"
           value={data.department}
-          disabled={!!data.province}
-          onChange={(e) => {
-            onChange('department', e.target.value);
-            if (e.target.value) onChange('province', null);
-          }}
+          onChange={(e) => onChange('department', e.target.value)}
           error={errors.department}
           options={departmentOptions}
           required
@@ -116,7 +107,7 @@ export function LocationFields({
   );
 }
 
-export function SportTypeSelector({
+export function SportCategory({
   data,
   onChange,
   errors,
@@ -127,86 +118,74 @@ export function SportTypeSelector({
 }) {
   const { t, optLabel } = useI18n();
 
-  // handle selecting a category
-  const handleCategoryChange = (category: string | null) => {
+  const handleCategoryChange = (category: string) => {
     onChange('typeOfSport', category);
-    const firstSport = category && sportsByCategory[category] && sportsByCategory[category].length > 0
-      ? sportsByCategory[category][0]
-      : null;
-    onChange('selectedSport', firstSport);
-    if (firstSport === null ) {
-      onChange('selectedSport', null);
-    }
+    onChange('selectedSport', null);
   };
 
-  return (
-    <Box mt={3}>
-      <Typography variant="h6" fontWeight={700} mb={1}>
-        {t('sport.selector.title', 'Sport Category')}
-      </Typography>
-
-      {/* Category Selection */}
-      <Typography variant="body1" color="text.secondary" mb={1}>
-        {t('sport.selector.subtitle', 'Select a sport category')}
-      </Typography>
-      <Box
-        display="grid"
-        gap={2}
-        sx={{ gridTemplateColumns: { xs: '1fr', sm: 'repeat(5, 1fr)' }}} // 5 columns
-      >
-        {sportCategories.map((cat) => (
-          <FormControlLabel
-            key={cat}
-            control={
-              <Checkbox
-                checked={data.typeOfSport === cat}
-                onChange={() =>
-                  handleCategoryChange(data.typeOfSport === cat ? null : cat)
-                }
-              />
-            }
-            label={optLabel('sportCategories', cat)}
-          />
-        ))}
-      </Box>
-      {errors.typeOfSport && (
-        <Typography mt={0.5} color="error">
-          {errors.typeOfSport}
-        </Typography>
-      )}
-    </Box>
-  );
-}
-
-export function SportSelect({
-  data,
-  onChange,
-  errors,
-}: {
-  data: FormData;
-  onChange: OnFieldChange;
-  errors: FormErrors;
-}) {
-  const { t, optLabel } = useI18n();
   const sportOptions = (data.typeOfSport ? sportsByCategory[data.typeOfSport] ?? [] : []).map(
     (sport) => ({ value: sport, label: optLabel('sports', sport) })
   );
 
   return (
-    <Box mt={2}>
-      <FormField
-        select
-        label={t('sport.select.label', 'Select Sport')}
-        name="selectedSport"
-        value={data.selectedSport ?? ''}
-        onChange={(e) => onChange('selectedSport', e.target.value)}
-        error={errors.selectedSport}
-        options={[
-          { value: '', label: t('sport.select.placeholder', 'Select a sport') },
-          ...sportOptions,
-        ]}
-        required
-      />
+    <Box>
+      <Typography variant="h6" fontWeight={700} mb={1}>
+        {t('sport.selector.title', 'Sport Category')}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" mb={2}>
+        {t('sport.selector.subtitle', 'Choose a category, then pick a specific sport')}
+      </Typography>
+
+      <Box
+        display="grid"
+        gap={2}
+        sx={{ gridTemplateColumns: { xs: '1fr', sm: 'repeat(5, 1fr)' } }}
+      >
+        {sportCategories.map((cat) => (
+          <Paper
+            key={cat}
+            onClick={() => handleCategoryChange(cat)}
+            sx={{
+              p: 2,
+              textAlign: 'center',
+              border: `1px solid ${data.typeOfSport === cat ? '#4A7C59' : '#DDDDDD'}`,
+              borderRadius: 2,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+              },
+            }}
+          >
+            <Typography variant="body2" fontWeight={600}>
+              {optLabel('sportCategories', cat)}
+            </Typography>
+          </Paper>
+        ))}
+      </Box>
+      {errors.typeOfSport && (
+        <Typography mt={1} color="error">
+          {errors.typeOfSport}
+        </Typography>
+      )}
+
+      <Box mt={3}>
+        <FormField
+          select
+          label={t('sport.select.label', 'Select Sport')}
+          name="selectedSport"
+          value={data.selectedSport ?? ''}
+          onChange={(e) => onChange('selectedSport', e.target.value)}
+          error={errors.selectedSport}
+          options={[
+            { value: '', label: t('sport.select.placeholder', 'Select a sport') },
+            ...sportOptions,
+          ]}
+          required
+          disabled={!data.typeOfSport}
+        />
+      </Box>
     </Box>
   );
 }
@@ -238,7 +217,7 @@ export function PersonalInfoFields({
       ];
 
   return (
-    <Box mt={3}>
+    <Box>
       <Typography variant="h6" fontWeight={700} mb={1}>
         {t('personal.title', 'Personal Information')}
       </Typography>
@@ -250,11 +229,7 @@ export function PersonalInfoFields({
         display="grid"
         gap={2}
         sx={{
-          gridTemplateColumns: {
-            xs: '1fr',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(3, 1fr)',
-          },
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
         }}
       >
         <FormField
@@ -279,11 +254,6 @@ export function PersonalInfoFields({
           value={data.position}
           onChange={(e) => onChange('position', e.target.value)}
           error={errors.position}
-          helperText={
-            isPlayerRegistration
-              ? t('positions.playerFixed', 'Fixed as Player')
-              : errors.position
-          }
           select
           options={positionOptions}
           disabled={isPlayerRegistration}
@@ -329,31 +299,74 @@ export function PhotoUpload({
   error?: string;
 }) {
   const { t } = useI18n();
-  const [fileName, setFileName] = React.useState<string>('');
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] || null;
-    setFileName(f ? f.name : '');
     onFileChange(f);
   };
 
   return (
-    <Box mt={3}>
+    <Box>
       <Typography variant="h6" fontWeight={700} mb={1}>
-        {t('upload.title', 'Upload Photo (optional)')}
+        {t('upload.title', 'Upload Photo')}
       </Typography>
-      <Typography variant="body1" color="text.secondary" mb={2}>
-        {t('upload.subtitle', 'Please upload a clear image. Maximum size: 2MB.')}
-      </Typography>
-      <Button
-        variant="outlined"
+      <Box
+        sx={{
+          border: '2px dashed #DDDDDD',
+          borderRadius: 2,
+          p: 4,
+          textAlign: 'center',
+          cursor: 'pointer',
+          '&:hover': {
+            borderColor: '#4A7C59',
+          },
+        }}
         component="label"
-        fullWidth
-        sx={{ p: 2, justifyContent: 'flex-start' }}
       >
-        {file ? file.name : fileName || t('upload.choose', 'Choose file...')}
         <input type="file" hidden accept="image/*" onChange={handleFile} />
-      </Button>
+        <Box sx={{ mb: 1 }}>
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M37 22.5V37C37 38.1046 36.1046 39 35 39H13C11.8954 39 11 38.1046 11 37V11C11 9.89543 11.8954 9 13 9H22.5"
+              stroke="#4A7C59"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M30 9L39 18M30 18L39 9"
+              stroke="#4A7C59"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M24 22.5V31.5M19.5 27H28.5"
+              stroke="#4A7C59"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Box>
+        <Typography variant="body1" color="text.secondary">
+          {t('upload.dragAndDrop', 'Click to upload or drag and drop')}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {t('upload.fileSizeLimit', 'PNG, JPG up to 2MB')}
+        </Typography>
+        {file && (
+          <Typography variant="body2" color="text.primary" mt={1}>
+            {file.name}
+          </Typography>
+        )}
+      </Box>
       {error && (
         <Typography mt={1} color="error">
           {error}
@@ -372,14 +385,13 @@ export function SubmitActions({
 }) {
   const { t } = useI18n();
   return (
-    <Box display="flex" gap={2} mt={3}>
+    <Box display="flex" gap={2} mt={4}>
       <Button
         type="submit"
         variant="contained"
         color="primary"
         fullWidth
         size="large"
-        sx={{ py: 1.5, fontSize: '1.1rem', fontWeight: 700 }}
         disabled={!!submitting}
       >
         {submitting ? t('buttons.submitting', 'Submitting…') : t('buttons.submit', 'Register Now')}
@@ -387,10 +399,8 @@ export function SubmitActions({
       <Button
         type="button"
         variant="outlined"
-        color="inherit"
         fullWidth
         size="large"
-        sx={{ py: 1.5, fontSize: '1.1rem', fontWeight: 700 }}
         onClick={onReset}
       >
         {t('buttons.reset', 'Reset')}
